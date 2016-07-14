@@ -1,80 +1,66 @@
 'use strict';
 
 const Botkit = require('botkit');
-const CronJob = require('cron').CronJob;
-const currentWeekNumber = require('current-week-number');
+const moment = require('moment');
+
+require('moment-recur');
 
 const slackApiToken = process.env.SLACK_API_TOKEN;
 const slackWebhookURL = process.env.SLACK_WEBHOOK_URL;
-const scheduleWeekDay = process.env.SCHEDULE_WEEK_DAY;
+const startDate = moment(process.env.START_DATE, 'DD/MM/YYYY');
+const intervalDays = process.env.INTERVAL_DAYS;
 const scheduleTime = process.env.SCHEDULE_TIME;
-const scheduleOddWeeks = process.env.SCHEDULE_ODD_WEEKS;
 
+const timeFormat = 'dddd, MMM Do [at] hh:mm';
 const messageToBot = [
   'direct_message',
   'direct_mention',
   'mention'
 ];
 
+// set up recurrence
+const recurrence = startDate.recur().every(intervalDays, 'days');
+
+console.log(recurrence.next(1)[0].format(timeFormat));
+
+// set up slack bot controller
 const controller = Botkit.slackbot({ debug: false });
 
 // connect the bot to a stream of messages
-const sendBot = controller.spawn({
+const announcer = controller.spawn({
   token: slackApiToken,
   incoming_webhook: { url: slackWebhookURL }
 }).startRTM();
 
-const oneDayBeforeJob = new CronJob(
-  `* ${scheduleTime} * * ${weekDay(scheduleWeekDay) - 1}`,
-  sayOneDayBefore
-);
-
-oneDayBeforeJob.start();
-
-const leavingJob = new CronJob(
-  `* ${scheduleTime} * * ${weekDay(scheduleWeekDay)}`,
-  sayLeaving
-);
-
-leavingJob.start();
-
 controller.hears(['hi', 'hello'], messageToBot, sayHi);
-controller.hears('next', messageToBot, sayNextTrain);
-controller.hears('schedule', messageToBot, saySchedule);
+controller.hears(['when', 'next', 'train'], messageToBot, sayNextTrain);
+controller.hears(['schedule', 'trains'], messageToBot, saySchedule);
+
+setInterval(checkForEvents, 1000);
 
 /**
- * Returns whether the week is odd/even as desired
- * @returns {boolean} Whether the week number is odd/even to release
+ * Checks if a reocurring event occurs in that second
+ * @returns {void}
  */
-function correctOddness() {
-  const oddWeek = currentWeekNumber() % 2 === 1;
+function checkForEvents() {
+  const now = moment();
 
-  return oddWeek === scheduleOddWeeks;
-}
+  if (
+    recurrence.matches(now.subtract(1, 'day')) &&
+    now.hours() === scheduleTime &&
+    now.minutes() === 0 &&
+    now.seconds() === 0
+  ) {
+    sayOneDayBefore();
+  }
 
-/**
- * Returns the CRON weekday
- * @param {string} day The weekday
- * @returns {number} The CRON weekday number
- */
-function weekDay(day) {
-  switch (day) {
-  case 'Sunday':
-    return 0;
-  case 'Monday':
-    return 1;
-  case 'Tuesday':
-    return 2;
-  case 'Wednesday':
-    return 3;
-  case 'Thursday':
-    return 4;
-  case 'Friday':
-    return 5;
-  case 'Saturday':
-    return 6;
-  default:
-    return 0;
+  if (
+    recurrence.matches(now) &&
+    now.hours() === scheduleTime &&
+    now.minutes() === 0 &&
+    now.seconds() === 0
+  ) {
+    sayLeaving();
   }
 }
 
@@ -87,12 +73,12 @@ function weekDay(day) {
 function sayHi(bot, message) {
   bot.reply(
     message,
-    'Hi there.'
+    'Hi there. How can I help you?'
   );
 }
 
 /**
- * Replies when the train is leaving
+ * Replies saying when the train is leaving
  * @param {object} bot The slack bot
  * @param {string} message The message to say
  * @returns {void}
@@ -100,20 +86,27 @@ function sayHi(bot, message) {
 function sayNextTrain(bot, message) {
   bot.reply(
     message,
-    `The next release train leaves on ${scheduleWeekDay} at ${scheduleTime}:00.`
+    `The next release train leaves on ${recurrence.next(1)[0].format(timeFormat)}.`
   );
 }
 
 /**
- * Replies with train schedule
+ * Replies with the train schedule
  * @param {object} bot The slack bot
  * @param {string} message The message to say
  * @returns {void}
  */
 function saySchedule(bot, message) {
+  const dates = recurrence.next(5);
+  let text = 'The release trains leaves on the following dates: \n';
+
+  for (let i = 0; i < dates.length; i++) {
+    text += `${dates[i].format(timeFormat)} \n`;
+  }
+
   bot.reply(
     message,
-    `The release train leaves every ${scheduleWeekDay} at ${scheduleTime}:00.`
+    text
   );
 }
 
@@ -122,12 +115,10 @@ function saySchedule(bot, message) {
  * @returns {void}
  */
 function sayOneDayBefore() {
-  if (correctOddness()) {
-    sendBot.sendWebhook({
-      text: 'The release train leaves tomorrow!',
-      channel: '#release'
-    });
-  }
+  announcer.sendWebhook({
+    text: `The release train leaves tomorrow at ${recurrence.next(1).format('hh:mm')}!`,
+    channel: '#release'
+  });
 }
 
 /**
@@ -135,10 +126,8 @@ function sayOneDayBefore() {
  * @returns {void}
  */
 function sayLeaving() {
-  if (correctOddness()) {
-    sendBot.sendWebhook({
-      text: 'Choo! Choo! The release train is leaving!',
-      channel: '#release'
-    });
-  }
+  announcer.sendWebhook({
+    text: 'Choo! Choo! The release train is leaving!',
+    channel: '#release'
+  });
 }
