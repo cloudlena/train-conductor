@@ -1,13 +1,13 @@
 ---
 applications:
-  - name: conductor
+  - name: train-conductor
     buildpack: https://github.com/cloudfoundry/buildpack-nodejs.git
     no-route: true
     health-check-type: none
-    memory: 64M
+    memory: 128M
     env:
       SLACK_API_TOKEN: xxx
       SLACK_WEBHOOK_URL: xxx
-      SCHEDULE_WEEK_DAY: Tuesday
+      START_DATE: 30/06/2016
+      INTERVAL_DAYS: 14
       SCHEDULE_TIME: 12
-      SCHEDULE_ODDWEEKS: false
