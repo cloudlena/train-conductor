@@ -61,9 +61,10 @@ const announcer = controller.spawn({
   incoming_webhook: { url: slackWebhookURL }
 }).startRTM();
 
-controller.hears(['hi', 'hello'], messageToBot, sayHi);
+controller.hears(['hi', 'hello', 'howdy'], messageToBot, sayHi);
 controller.hears(['when', 'next', 'train'], messageToBot, sayNextTrain);
-controller.hears(['schedule', 'trains'], messageToBot, saySchedule);
+controller.hears(['schedule'], messageToBot, saySchedule);
+controller.hears(['.*'], messageToBot, sayDefault);
 
 setInterval(checkForEvents, 60 * 1000);
 
@@ -160,4 +161,17 @@ function sayLeaving() {
   });
 
   winston.log('info', 'Train leaving now');
+}
+
+/**
+ * Default message if conductor doesn't understand the question
+ * @param {object} bot The slack bot
+ * @param {string} message The message to say
+ * @returns {void}
+ */
+function sayDefault(bot, message) {
+  bot.reply(
+    message,
+    'Does not compute... I only know about trains ;-)'
+  );
 }
