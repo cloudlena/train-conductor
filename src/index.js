@@ -19,11 +19,11 @@ const messageToBot = [
   'mention'
 ];
 
-// check if start date valid
+// check if start date is valid
 if (!startDate.isValid()) {
   throw Error('Invalid start date. Please use DD/MM/YYYY');
 }
-// check if schedule time valid
+// check if schedule time is valid
 if (!scheduleTime.isValid()) {
   throw Error('Invalid schedule time. Please use HH:mm');
 }
@@ -33,6 +33,19 @@ const recurrence = startDate
   .subtract(intervalDays, 'days')
   .recur()
   .every(intervalDays, 'days');
+
+let found = false;
+
+while (!found) {
+  const now = moment();
+  const nextDate = recurrence.next(1)[0];
+
+  if (nextDate.isBefore(now)) {
+    recurrence.fromDate(nextDate);
+  } else {
+    found = true;
+  }
+}
 
 winston.log('info', `Recurrence set. Next train scheduled for ${recurrence.next(1)[0].format('DD/MM/YYYY')} at ${scheduleTime.format('HH:mm')}`);
 
@@ -60,6 +73,7 @@ function checkForEvents() {
 
   if (recurrence.matches(now) && scheduleTime.isSame(now, 'minute')) {
     sayLeaving();
+    recurrence.fromDate(recurrence.next(1)[0]);
   }
 
   if (recurrence.matches(now.subtract(1, 'day')) && scheduleTime.isSame(now, 'minute')) {
