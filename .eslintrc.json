@@ -1,3 +1,6 @@
 {
-  "extends": "mastertinner-nodejs"
+  "extends": "mastertinner-nodejs",
+  "rules": {
+    "max-len": "off"
+  }
 }
