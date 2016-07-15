@@ -13,7 +13,8 @@
   "dependencies": {
     "botkit": "^0.2.2",
     "moment": "^2.14.1",
-    "moment-recur": "^1.0.5"
+    "moment-recur": "^1.0.5",
+    "winston": "^2.2.0"
   },
   "devDependencies": {
     "eslint": "^3.0.0",

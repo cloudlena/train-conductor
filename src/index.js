@@ -2,14 +2,15 @@
 
 const Botkit = require('botkit');
 const moment = require('moment');
+const winston = require('winston');
 
 require('moment-recur');
 
 const slackApiToken = process.env.SLACK_API_TOKEN;
 const slackWebhookURL = process.env.SLACK_WEBHOOK_URL;
 const startDate = moment(process.env.START_DATE, 'DD/MM/YYYY');
+const scheduleTime = moment(process.env.SCHEDULE_TIME, 'HH:mm');
 const intervalDays = process.env.INTERVAL_DAYS;
-const scheduleTime = process.env.SCHEDULE_TIME;
 
 const timeFormat = 'dddd, MMM Do [at] hh:mm';
 const messageToBot = [
@@ -18,10 +19,22 @@ const messageToBot = [
   'mention'
 ];
 
-// set up recurrence
-const recurrence = startDate.recur().every(intervalDays, 'days');
+// check if start date valid
+if (!startDate.isValid()) {
+  throw Error('Invalid start date. Please use DD/MM/YYYY');
+}
+// check if schedule time valid
+if (!scheduleTime.isValid()) {
+  throw Error('Invalid schedule time. Please use HH:mm');
+}
 
-console.log(recurrence.next(1)[0].format(timeFormat));
+// set up recurrence
+const recurrence = startDate
+  .subtract(intervalDays, 'days')
+  .recur()
+  .every(intervalDays, 'days');
+
+winston.log('info', `Recurrence set. Next train scheduled for ${recurrence.next(1)[0].format('DD/MM/YYYY')} at ${scheduleTime.format('HH:mm')}`);
 
 // set up slack bot controller
 const controller = Botkit.slackbot({ debug: false });
@@ -36,7 +49,7 @@ controller.hears(['hi', 'hello'], messageToBot, sayHi);
 controller.hears(['when', 'next', 'train'], messageToBot, sayNextTrain);
 controller.hears(['schedule', 'trains'], messageToBot, saySchedule);
 
-setInterval(checkForEvents, 1000);
+setInterval(checkForEvents, 60 * 1000);
 
 /**
  * Checks if a reocurring event occurs in that second
@@ -45,22 +58,12 @@ setInterval(checkForEvents, 1000);
 function checkForEvents() {
   const now = moment();
 
-  if (
-    recurrence.matches(now.subtract(1, 'day')) &&
-    now.hours() === scheduleTime &&
-    now.minutes() === 0 &&
-    now.seconds() === 0
-  ) {
-    sayOneDayBefore();
+  if (recurrence.matches(now) && scheduleTime.isSame(now, 'minute')) {
+    sayLeaving();
   }
 
-  if (
-    recurrence.matches(now) &&
-    now.hours() === scheduleTime &&
-    now.minutes() === 0 &&
-    now.seconds() === 0
-  ) {
-    sayLeaving();
+  if (recurrence.matches(now.subtract(1, 'day')) && scheduleTime.isSame(now, 'minute')) {
+    sayOneDayBefore();
   }
 }
 
@@ -75,6 +78,8 @@ function sayHi(bot, message) {
     message,
     'Hi there. How can I help you?'
   );
+
+  winston.log('info', `${message.user} says hi`);
 }
 
 /**
@@ -88,6 +93,8 @@ function sayNextTrain(bot, message) {
     message,
     `The next release train leaves on ${recurrence.next(1)[0].format(timeFormat)}.`
   );
+
+  winston.log('info', `${message.user} asks for next train`);
 }
 
 /**
@@ -108,6 +115,8 @@ function saySchedule(bot, message) {
     message,
     text
   );
+
+  winston.log('info', `${message.user} asks for schedule`);
 }
 
 /**
@@ -119,6 +128,8 @@ function sayOneDayBefore() {
     text: `The release train leaves tomorrow at ${recurrence.next(1).format('hh:mm')}!`,
     channel: '#release'
   });
+
+  winston.log('info', 'Train leaving in one day');
 }
 
 /**
@@ -130,4 +141,6 @@ function sayLeaving() {
     text: 'Choo! Choo! The release train is leaving!',
     channel: '#release'
   });
+
+  winston.log('info', 'Train leaving now');
 }

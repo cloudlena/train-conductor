@@ -9,5 +9,5 @@ applications:
       SLACK_API_TOKEN: xxx
       SLACK_WEBHOOK_URL: xxx
       START_DATE: 30/06/2016
+      SCHEDULE_TIME: 12:00
       INTERVAL_DAYS: 14
-      SCHEDULE_TIME: 12
