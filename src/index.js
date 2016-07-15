@@ -40,6 +40,9 @@ while (!found) {
   const now = moment();
   const nextDate = recurrence.next(1)[0];
 
+  nextDate.hours(scheduleTime.hours());
+  nextDate.minutes(scheduleTime.minutes());
+
   if (nextDate.isBefore(now)) {
     recurrence.fromDate(nextDate);
   } else {
