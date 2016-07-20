@@ -58,7 +58,8 @@ const controller = Botkit.slackbot({ debug: false });
 // connect the bot to a stream of messages
 const announcer = controller.spawn({
   token: slackApiToken,
-  incoming_webhook: { url: slackWebhookURL }
+  incoming_webhook: { url: slackWebhookURL },
+  retry: true
 }).startRTM();
 
 controller.hears(['hi', 'hello', 'howdy'], messageToBot, sayHi);
