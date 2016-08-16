@@ -29,28 +29,14 @@ if (!scheduleTime.isValid()) {
 }
 
 // set up recurrence
-const recurrence = startDate
+const trainRecurrence = startDate
   .subtract(intervalDays, 'days')
   .recur()
   .every(intervalDays, 'days');
 
-let found = false;
+dropPastOccurrences(trainRecurrence);
 
-while (!found) {
-  const now = moment();
-  const nextDate = recurrence.next(1)[0];
-
-  nextDate.hours(scheduleTime.hours());
-  nextDate.minutes(scheduleTime.minutes());
-
-  if (nextDate.isBefore(now)) {
-    recurrence.fromDate(nextDate);
-  } else {
-    found = true;
-  }
-}
-
-winston.log('info', `Recurrence set. Next train scheduled for ${recurrence.next(1)[0].format('DD/MM/YYYY')} at ${scheduleTime.format('HH:mm')}`);
+winston.info(`Recurrence set. Next train scheduled for ${trainRecurrence.next(1)[0].format('DD/MM/YYYY')} at ${scheduleTime.format('HH:mm')}`);
 
 // set up slack bot controller
 const controller = Botkit.slackbot({ debug: false });
@@ -67,21 +53,47 @@ controller.hears(['when', 'next', 'train'], messageToBot, sayNextTrain);
 controller.hears(['schedule'], messageToBot, saySchedule);
 controller.hears(['.*'], messageToBot, sayDefault);
 
-setInterval(checkForEvents, 60 * 1000);
+setInterval(() => checkForEvents(trainRecurrence), 60 * 1000);
 
 /**
- * Checks if a reocurring event occurs in that second
+ * Updates a recurrence so that it only contains occurrences in the future
+ * @param {object} recurrence The recurrence to work on
  * @returns {void}
  */
-function checkForEvents() {
+function dropPastOccurrences(recurrence) {
+  let found = false;
+
+  while (!found) {
+    const now = moment();
+    const nextDate = recurrence.next(1)[0];
+
+    nextDate.hours(scheduleTime.hours());
+    nextDate.minutes(scheduleTime.minutes());
+
+    if (nextDate.isBefore(now)) {
+      recurrence.fromDate(nextDate);
+    } else {
+      found = true;
+    }
+  }
+}
+
+/**
+ * Checks if a recurring event occurs in that minute
+ * @param {object} recurrence The recurrence to check
+ * @returns {void}
+ */
+function checkForEvents(recurrence) {
   const now = moment();
 
-  if (recurrence.matches(now) && scheduleTime.isSame(now, 'minute')) {
+  if (recurrence.matches(now) && scheduleTime.minutes() === now.minutes()) {
+    winston.info('Train about to leave.');
     sayLeaving();
     recurrence.fromDate(recurrence.next(1)[0]);
   }
 
-  if (recurrence.matches(now.subtract(1, 'day')) && scheduleTime.isSame(now, 'minute')) {
+  if (recurrence.matches(now.subtract(1, 'day')) && scheduleTime.minutes() === now.minutes()) {
+    winston.info('Train leaving in one day.');
     sayOneDayBefore();
   }
 }
@@ -98,7 +110,7 @@ function sayHi(bot, message) {
     'Hi there. How can I help you?'
   );
 
-  winston.log('info', `${message.user} says hi`);
+  winston.info(`${message.user} says hi`);
 }
 
 /**
@@ -110,10 +122,10 @@ function sayHi(bot, message) {
 function sayNextTrain(bot, message) {
   bot.reply(
     message,
-    `The next release train leaves on ${recurrence.next(1)[0].format(timeFormat)}.`
+    `The next release train leaves on ${trainRecurrence.next(1)[0].format(timeFormat)}.`
   );
 
-  winston.log('info', `${message.user} asks for next train`);
+  winston.info(`${message.user} asks for next train`);
 }
 
 /**
@@ -123,7 +135,7 @@ function sayNextTrain(bot, message) {
  * @returns {void}
  */
 function saySchedule(bot, message) {
-  const dates = recurrence.next(5);
+  const dates = trainRecurrence.next(5);
   let text = 'The release trains leaves on the following dates: \n';
 
   for (let i = 0; i < dates.length; i++) {
@@ -144,11 +156,11 @@ function saySchedule(bot, message) {
  */
 function sayOneDayBefore() {
   announcer.sendWebhook({
-    text: `The release train leaves tomorrow at ${recurrence.next(1).format('hh:mm')}!`,
+    text: `The release train leaves tomorrow at ${trainRecurrence.next(1).format('hh:mm')}!`,
     channel: '#release'
   });
 
-  winston.log('info', 'Train leaving in one day');
+  winston.log('info', 'Announced: Train leaving in one day');
 }
 
 /**
@@ -161,7 +173,7 @@ function sayLeaving() {
     channel: '#release'
   });
 
-  winston.log('info', 'Train leaving now');
+  winston.log('info', 'Announced: Train leaving now');
 }
 
 /**
