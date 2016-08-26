@@ -1,7 +1,7 @@
 'use strict';
 
 const Botkit = require('botkit');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const winston = require('winston');
 
 require('moment-recur');
@@ -12,7 +12,7 @@ const startDate = moment(process.env.START_DATE, 'DD/MM/YYYY');
 const scheduleTime = moment(process.env.SCHEDULE_TIME, 'HH:mm');
 const intervalDays = process.env.INTERVAL_DAYS;
 
-const timeFormat = 'dddd, MMM Do [at] hh:mm';
+const dateFormat = 'dddd, MMM Do';
 const messageToBot = [
   'direct_message',
   'direct_mention',
@@ -84,15 +84,17 @@ function dropPastOccurrences(recurrence) {
  * @returns {void}
  */
 function checkForEvents(recurrence) {
-  const now = moment();
+  const now = moment.tz('Europe/Zurich');
 
-  if (recurrence.matches(now) && scheduleTime.minutes() === now.minutes()) {
+  winston.info(`Checking for events at ${now.format('HH:mm:ss')}`);
+
+  if (recurrence.matches(now) && scheduleTime.hours() === now.hours() && scheduleTime.minutes() === now.minutes()) {
     winston.info('Train about to leave.');
     sayLeaving();
     recurrence.fromDate(recurrence.next(1)[0]);
   }
 
-  if (recurrence.matches(now.subtract(1, 'day')) && scheduleTime.minutes() === now.minutes()) {
+  if (recurrence.matches(now.add(1, 'day')) && scheduleTime.hours() === now.hours() && scheduleTime.minutes() === now.minutes()) {
     winston.info('Train leaving in one day.');
     sayOneDayBefore();
   }
@@ -122,7 +124,7 @@ function sayHi(bot, message) {
 function sayNextTrain(bot, message) {
   bot.reply(
     message,
-    `The next release train leaves on ${trainRecurrence.next(1)[0].format(timeFormat)}.`
+    `The next release train leaves on ${trainRecurrence.next(1)[0].format(dateFormat)} at ${scheduleTime.format('HH:mm')}.`
   );
 
   winston.info(`${message.user} asks for next train`);
@@ -139,7 +141,7 @@ function saySchedule(bot, message) {
   let text = 'The release trains leaves on the following dates: \n';
 
   for (let i = 0; i < dates.length; i++) {
-    text += `${dates[i].format(timeFormat)} \n`;
+    text += `${dates[i].format(dateFormat)} at ${scheduleTime.format('HH:mm')} \n`;
   }
 
   bot.reply(
@@ -156,7 +158,7 @@ function saySchedule(bot, message) {
  */
 function sayOneDayBefore() {
   announcer.sendWebhook({
-    text: `The release train leaves tomorrow at ${trainRecurrence.next(1).format('hh:mm')}!`,
+    text: `The release train leaves tomorrow at ${scheduleTime.format('HH:mm')}!`,
     channel: '#release'
   });
 
