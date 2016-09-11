@@ -12,7 +12,7 @@
     "start": "node src",
     "lint": "eslint .",
     "pretest": "npm run lint",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\""
   },
   "author": "Tobias Fuhrimann <tobias.fuhrimann@swisscom.com>",
   "license": "ISC",
@@ -23,8 +23,8 @@
     "winston": "^2.2.0"
   },
   "devDependencies": {
-    "eslint": "^3.4.0",
-    "eslint-config-mastertinner-nodejs": "^6.0.0",
+    "eslint": "^3.5.0",
+    "eslint-config-mastertinner-nodejs": "^7.0.1",
     "eslint-plugin-mocha": "^4.5.1"
   },
   "engines": {
