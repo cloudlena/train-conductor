@@ -25,7 +25,8 @@
   "devDependencies": {
     "eslint": "^3.5.0",
     "eslint-config-mastertinner-nodejs": "^7.0.1",
-    "eslint-plugin-mocha": "^4.5.1"
+    "eslint-plugin-mocha": "^4.5.1",
+    "pre-commit": "^1.1.3"
   },
   "engines": {
     "node": ">= 4"
