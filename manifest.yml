@@ -6,8 +6,8 @@ applications:
     health-check-type: none
     memory: 128M
     env:
-      SLACK_API_TOKEN: xxx
-      SLACK_WEBHOOK_URL: xxx
-      START_DATE: 30/06/2016
+      SLACK_API_TOKEN: xoxb-55751657029-LUXDHsdiQLABaPKG9099TG5w
+      SLACK_WEBHOOK_URL: https://hooks.slack.com/services/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
+      START_DATE: 25/08/2016
       SCHEDULE_TIME: 12:00
       INTERVAL_DAYS: 14
