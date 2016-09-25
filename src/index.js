@@ -16,7 +16,7 @@ const dateFormat = 'dddd, MMM Do';
 const messageToBot = [
   'direct_message',
   'direct_mention',
-  'mention'
+  'mention',
 ];
 
 // check if start date is valid
@@ -45,7 +45,7 @@ const controller = Botkit.slackbot({ debug: false });
 const announcer = controller.spawn({
   token: slackApiToken,
   incoming_webhook: { url: slackWebhookURL },
-  retry: true
+  retry: true,
 }).startRTM();
 
 controller.hears(['hi', 'hello', 'howdy'], messageToBot, sayHi);
@@ -159,7 +159,7 @@ function saySchedule(bot, message) {
 function sayOneDayBefore() {
   announcer.sendWebhook({
     text: `The release train leaves tomorrow at ${scheduleTime.format('HH:mm')}!`,
-    channel: '#release'
+    channel: '#release',
   });
 
   winston.log('info', 'Announced: Train leaving in one day');
@@ -172,7 +172,7 @@ function sayOneDayBefore() {
 function sayLeaving() {
   announcer.sendWebhook({
     text: 'Choo! Choo! The release train is leaving!',
-    channel: '#release'
+    channel: '#release',
   });
 
   winston.log('info', 'Announced: Train leaving now');
