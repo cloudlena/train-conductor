@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "start": "node src",
-    "lint": "eslint .",
+    "lint": "eslint . --fix",
     "pretest": "npm run lint",
     "test": "echo \"Error: no test specified\""
   },
