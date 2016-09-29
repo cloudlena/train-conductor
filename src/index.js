@@ -12,6 +12,8 @@ const startDate = moment(process.env.START_DATE, 'DD/MM/YYYY');
 const scheduleTime = moment(process.env.SCHEDULE_TIME, 'HH:mm');
 const intervalDays = process.env.INTERVAL_DAYS;
 
+const NUM_TRAINS_SCHEDULE = 5;
+const MS_IN_MINUTE = 60000;
 const dateFormat = 'dddd, MMM Do';
 const messageToBot = [
   'direct_message',
@@ -53,7 +55,7 @@ controller.hears(['when', 'next', 'train'], messageToBot, sayNextTrain);
 controller.hears(['schedule'], messageToBot, saySchedule);
 controller.hears(['.*'], messageToBot, sayDefault);
 
-setInterval(() => checkForEvents(trainRecurrence), 60 * 1000);
+setInterval(() => checkForEvents(trainRecurrence), MS_IN_MINUTE);
 
 /**
  * Updates a recurrence so that it only contains occurrences in the future
@@ -137,7 +139,7 @@ function sayNextTrain(bot, message) {
  * @returns {void}
  */
 function saySchedule(bot, message) {
-  const dates = trainRecurrence.next(5);
+  const dates = trainRecurrence.next(NUM_TRAINS_SCHEDULE);
   let text = 'The release trains leaves on the following dates: \n';
 
   for (let i = 0; i < dates.length; i++) {
