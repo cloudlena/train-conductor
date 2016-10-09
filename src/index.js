@@ -10,7 +10,7 @@ const slackApiToken = process.env.SLACK_API_TOKEN;
 const slackWebhookURL = process.env.SLACK_WEBHOOK_URL;
 const startDate = moment(process.env.START_DATE, 'DD/MM/YYYY');
 const scheduleTime = moment(process.env.SCHEDULE_TIME, 'HH:mm');
-const intervalDays = process.env.INTERVAL_DAYS;
+let intervalDays = process.env.INTERVAL_DAYS;
 
 const NUM_TRAINS_SCHEDULE = 5;
 const MS_IN_MINUTE = 60000;
@@ -21,6 +21,16 @@ const messageToBot = [
   'mention',
 ];
 
+// check if there is an API token
+if (!slackApiToken) {
+  throw Error('Please specify an API token');
+}
+
+// check if there is a Slack webhook URL
+if (!slackWebhookURL) {
+  throw Error('Please specify a Slack webhook URL');
+}
+
 // check if start date is valid
 if (!startDate.isValid()) {
   throw Error('Invalid start date. Please use DD/MM/YYYY');
@@ -28,6 +38,11 @@ if (!startDate.isValid()) {
 // check if schedule time is valid
 if (!scheduleTime.isValid()) {
   throw Error('Invalid schedule time. Please use HH:mm');
+}
+
+// set default for interval
+if (!intervalDays) {
+  intervalDays = 7;
 }
 
 // set up recurrence
