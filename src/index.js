@@ -6,12 +6,6 @@ const winston = require('winston');
 
 require('moment-recur');
 
-const slackApiToken = process.env.SLACK_API_TOKEN;
-const slackWebhookURL = process.env.SLACK_WEBHOOK_URL;
-const startDate = moment(process.env.START_DATE, 'DD/MM/YYYY');
-const scheduleTime = moment(process.env.SCHEDULE_TIME, 'HH:mm');
-let intervalDays = process.env.INTERVAL_DAYS;
-
 const NUM_TRAINS_SCHEDULE = 5;
 const MS_IN_MINUTE = 60000;
 const dateFormat = 'dddd, MMM Do';
@@ -21,28 +15,44 @@ const messageToBot = [
   'mention',
 ];
 
+const slackApiToken = process.env.SLACK_API_TOKEN;
+
 // check if there is an API token
 if (!slackApiToken) {
-  throw Error('Please specify an API token');
+  throw Error('Please specify a SLACK_API_TOKEN');
 }
+
+const slackWebhookURL = process.env.SLACK_WEBHOOK_URL;
 
 // check if there is a Slack webhook URL
 if (!slackWebhookURL) {
-  throw Error('Please specify a Slack webhook URL');
+  throw Error('Please specify a SLACK_WEBHOOK_URL');
 }
+
+const startDate = moment(process.env.START_DATE, 'DD/MM/YYYY');
 
 // check if start date is valid
 if (!startDate.isValid()) {
-  throw Error('Invalid start date. Please use DD/MM/YYYY');
+  throw Error('Invalid start date. Please use DD/MM/YYYY in START_DATE');
 }
+
+const scheduleTime = moment(process.env.SCHEDULE_TIME, 'HH:mm');
+
 // check if schedule time is valid
 if (!scheduleTime.isValid()) {
-  throw Error('Invalid schedule time. Please use HH:mm');
+  throw Error('Invalid schedule time. Please use HH:mm in SCHEDULE_TIME');
 }
+
+let intervalDays = process.env.INTERVAL_DAYS;
 
 // set default for interval
 if (!intervalDays) {
   intervalDays = 7;
+}
+
+// check if interval is valid
+if (isNaN(intervalDays)) {
+  throw Error('Invalid interval. Please specify number of days in INTERVAL_DAYS');
 }
 
 // set up recurrence
