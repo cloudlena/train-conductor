@@ -6,9 +6,10 @@ const winston = require("winston");
 
 require("moment-recur");
 
-const NUM_TRAINS_SCHEDULE = 5;
-const DEFAULT_INTERVAL_DAYS = 7;
-const MS_IN_MINUTE = 60000;
+const numTrainsSchedule = 5;
+const defaultIntervalDays = 7;
+const defaultSlackChannel = "#release";
+const msInMinute = 60000;
 const dateFormat = "dddd, MMM Do";
 const messageToBot = [
   "direct_message",
@@ -30,25 +31,32 @@ if (!slackWebhookURL) {
   throw Error("Please specify a SLACK_WEBHOOK_URL");
 }
 
+let slackChannel = process.env.SLACK_CHANNEL;
+
+// Check if there is a Slack channel, otherwise set default
+if (!slackChannel) {
+  slackChannel = defaultSlackChannel;
+}
+
 const startDate = moment(process.env.START_DATE, "DD/MM/YYYY");
 
 // Check if start date is valid
 if (!startDate.isValid()) {
-  throw Error("Invalid start date. Please use DD/MM/YYYY in START_DATE");
+  throw Error("Invalid start date. Please set START_DATE as DD/MM/YYYY");
 }
 
 const scheduleTime = moment(process.env.SCHEDULE_TIME, "HH:mm");
 
 // Check if schedule time is valid
 if (!scheduleTime.isValid()) {
-  throw Error("Invalid schedule time. Please use HH:mm in SCHEDULE_TIME");
+  throw Error("Invalid schedule time. Please set SCHEDULE_TIME as HH:mm");
 }
 
 let intervalDays = process.env.INTERVAL_DAYS;
 
 // Set default for interval
 if (!intervalDays) {
-  intervalDays = DEFAULT_INTERVAL_DAYS;
+  intervalDays = defaultIntervalDays;
 }
 
 // Check if interval is valid
@@ -81,7 +89,7 @@ controller.hears(["when", "next", "train"], messageToBot, sayNextTrain);
 controller.hears(["schedule"], messageToBot, saySchedule);
 controller.hears([".*"], messageToBot, sayDefault);
 
-setInterval(() => checkForEvents(trainRecurrence), MS_IN_MINUTE);
+setInterval(() => checkForEvents(trainRecurrence), msInMinute);
 
 /**
  * Updates a recurrence so that it only contains occurrences in the future
@@ -165,7 +173,7 @@ function sayNextTrain(bot, message) {
  * @returns {void}
  */
 function saySchedule(bot, message) {
-  const dates = trainRecurrence.next(NUM_TRAINS_SCHEDULE);
+  const dates = trainRecurrence.next(numTrainsSchedule);
   let text = "The release trains leaves on the following dates: \n";
 
   for (let i = 0; i < dates.length; i++) {
@@ -187,7 +195,7 @@ function saySchedule(bot, message) {
 function sayOneDayBefore() {
   announcer.sendWebhook({
     text: `The release train leaves tomorrow at ${scheduleTime.format("HH:mm")}!`,
-    channel: "#release",
+    channel: slackChannel,
   });
 
   winston.log("info", "Announced: Train leaving in one day");
@@ -200,7 +208,7 @@ function sayOneDayBefore() {
 function sayLeaving() {
   announcer.sendWebhook({
     text: "Choo! Choo! The release train is leaving!",
-    channel: "#release",
+    channel: slackChannel,
   });
 
   winston.log("info", "Announced: Train leaving now");
@@ -215,6 +223,6 @@ function sayLeaving() {
 function sayDefault(bot, message) {
   bot.reply(
     message,
-    "Does not compute... I only know about trains ;-)"
+    "Does not compute... I only know about trains :blush:"
   );
 }
