@@ -14,8 +14,8 @@ A Slack bot which announces the schedule of a [software release train](https://e
 Train Conductor is configured using environment variables:
 
 * `SLACK_API_TOKEN` - Your Slack API token
-* `SLACK_WEBHOOK_URL`- The webhook to use (must be configured to use the `#release` channel)
-* `SLACK_CHANNEL`- The webhook to use (must be configured to use the `#release` channel)
-* `START_DATE` - E.g. 16/03/2016
-* `SCHEDULE_TIME` - E.g. '14:00'
-* `INTERVAL_DAYS` - How many days until the next departure
+* `SLACK_WEBHOOK_URL`- The webhook to use (must be configured to use the correct channel)
+* `START_DATE` - When the release train leaves for the first time (e.g. `"16/03/2016"`)
+* `SCHEDULE_TIME` - The time of day on which the train leaves (e.g. `"14:00"`)
+* `INTERVAL_DAYS` - How many days between departures
+* `SLACK_CHANNEL`- Optional. The slack channel to use (defaults to `"#release"`)
