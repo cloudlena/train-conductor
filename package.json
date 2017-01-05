@@ -15,7 +15,7 @@
   "author": "Tobias Fuhrimann (https://berndsgn.ch)",
   "license": "ISC",
   "dependencies": {
-    "botkit": "^0.4.7",
+    "botkit": "^0.4.9",
     "moment-recur": "^1.0.5",
     "moment-timezone": "^0.5.11",
     "winston": "^2.2.0"
