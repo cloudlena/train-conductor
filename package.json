@@ -21,7 +21,7 @@
     "winston": "^2.2.0"
   },
   "devDependencies": {
-    "eslint": "^3.13.1",
+    "eslint": "^3.14.0",
     "eslint-config-mastertinner-nodejs": "^12.2.0",
     "eslint-plugin-mocha": "^4.8.0",
     "pre-commit": "^1.1.3"
