@@ -18,7 +18,7 @@
     "botkit": "^0.4.9",
     "moment-recur": "^1.0.5",
     "moment-timezone": "^0.5.11",
-    "winston": "^2.2.0"
+    "winston": "^2.3.1"
   },
   "devDependencies": {
     "eslint": "^3.14.0",
