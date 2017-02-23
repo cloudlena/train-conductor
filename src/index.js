@@ -12,56 +12,56 @@ const defaultSlackChannel = "#release";
 const msInMinute = 60000;
 const dateFormat = "dddd, MMM Do";
 const messageToBot = [
-  "direct_message",
-  "direct_mention",
-  "mention",
+    "direct_message",
+    "direct_mention",
+    "mention",
 ];
 
 const slackApiToken = process.env.SLACK_API_TOKEN;
 
 // Check if there is an API token
 if (!slackApiToken) {
-  throw Error("Please specify a SLACK_API_TOKEN");
+    throw Error("Please specify a SLACK_API_TOKEN");
 }
 
 const slackWebhookURL = process.env.SLACK_WEBHOOK_URL;
 
 // Check if there is a Slack webhook URL
 if (!slackWebhookURL) {
-  throw Error("Please specify a SLACK_WEBHOOK_URL");
+    throw Error("Please specify a SLACK_WEBHOOK_URL");
 }
 
 let slackChannel = process.env.SLACK_CHANNEL;
 
 // Check if there is a Slack channel, otherwise set default
 if (!slackChannel) {
-  slackChannel = defaultSlackChannel;
+    slackChannel = defaultSlackChannel;
 }
 
 const startDate = moment(process.env.START_DATE, "DD/MM/YYYY");
 
 // Check if start date is valid
 if (!startDate.isValid()) {
-  throw Error("Invalid start date. Please set START_DATE as DD/MM/YYYY");
+    throw Error("Invalid start date. Please set START_DATE as DD/MM/YYYY");
 }
 
 const scheduleTime = moment(process.env.SCHEDULE_TIME, "HH:mm");
 
 // Check if schedule time is valid
 if (!scheduleTime.isValid()) {
-  throw Error("Invalid schedule time. Please set SCHEDULE_TIME as HH:mm");
+    throw Error("Invalid schedule time. Please set SCHEDULE_TIME as HH:mm");
 }
 
 let intervalDays = process.env.INTERVAL_DAYS;
 
 // Set default for interval
 if (!intervalDays) {
-  intervalDays = defaultIntervalDays;
+    intervalDays = defaultIntervalDays;
 }
 
 // Check if interval is valid
 if (isNaN(intervalDays)) {
-  throw Error("Invalid interval. Please specify number of days in INTERVAL_DAYS");
+    throw Error("Invalid interval. Please specify number of days in INTERVAL_DAYS");
 }
 
 // Set up recurrence
@@ -79,9 +79,9 @@ const controller = Botkit.slackbot({ debug: false });
 
 // Connect the bot to a stream of messages
 const announcer = controller.spawn({
-  token: slackApiToken,
-  incoming_webhook: { url: slackWebhookURL },
-  retry: true,
+    token: slackApiToken,
+    incoming_webhook: { url: slackWebhookURL },
+    retry: true,
 }).startRTM();
 
 controller.hears(["hi", "hello", "howdy"], messageToBot, sayHi);
@@ -97,21 +97,21 @@ setInterval(() => checkForEvents(trainRecurrence), msInMinute);
  * @returns {void}
  */
 function dropPastOccurrences(recurrence) {
-  let found = false;
+    let found = false;
 
-  while (!found) {
-    const now = moment();
-    const nextDate = recurrence.next(1)[0];
+    while (!found) {
+        const now = moment();
+        const nextDate = recurrence.next(1)[0];
 
-    nextDate.hours(scheduleTime.hours());
-    nextDate.minutes(scheduleTime.minutes());
+        nextDate.hours(scheduleTime.hours());
+        nextDate.minutes(scheduleTime.minutes());
 
-    if (nextDate.isBefore(now)) {
-      recurrence.fromDate(nextDate);
-    } else {
-      found = true;
+        if (nextDate.isBefore(now)) {
+            recurrence.fromDate(nextDate);
+        } else {
+            found = true;
+        }
     }
-  }
 }
 
 /**
@@ -120,20 +120,20 @@ function dropPastOccurrences(recurrence) {
  * @returns {void}
  */
 function checkForEvents(recurrence) {
-  const now = moment.tz("Europe/Zurich");
+    const now = moment.tz("Europe/Zurich");
 
-  winston.info(`Checking for events at ${now.format("HH:mm:ss")}`);
+    winston.info(`Checking for events at ${now.format("HH:mm:ss")}`);
 
-  if (recurrence.matches(now) && scheduleTime.hours() === now.hours() && scheduleTime.minutes() === now.minutes()) {
-    winston.info("Train about to leave.");
-    sayLeaving();
-    recurrence.fromDate(recurrence.next(1)[0]);
-  }
+    if (recurrence.matches(now) && scheduleTime.hours() === now.hours() && scheduleTime.minutes() === now.minutes()) {
+        winston.info("Train about to leave.");
+        sayLeaving();
+        recurrence.fromDate(recurrence.next(1)[0]);
+    }
 
-  if (recurrence.matches(now.add(1, "day")) && scheduleTime.hours() === now.hours() && scheduleTime.minutes() === now.minutes()) {
-    winston.info("Train leaving in one day.");
-    sayOneDayBefore();
-  }
+    if (recurrence.matches(now.add(1, "day")) && scheduleTime.hours() === now.hours() && scheduleTime.minutes() === now.minutes()) {
+        winston.info("Train leaving in one day.");
+        sayOneDayBefore();
+    }
 }
 
 /**
@@ -143,12 +143,12 @@ function checkForEvents(recurrence) {
  * @returns {void}
  */
 function sayHi(bot, message) {
-  bot.reply(
+    bot.reply(
     message,
     "Hi there. How can I help you?"
   );
 
-  winston.info(`${message.user} says hi`);
+    winston.info(`${message.user} says hi`);
 }
 
 /**
@@ -158,12 +158,12 @@ function sayHi(bot, message) {
  * @returns {void}
  */
 function sayNextTrain(bot, message) {
-  bot.reply(
+    bot.reply(
     message,
     `The next release train leaves on ${trainRecurrence.next(1)[0].format(dateFormat)} at ${scheduleTime.format("HH:mm")}.`
   );
 
-  winston.info(`${message.user} asks for next train`);
+    winston.info(`${message.user} asks for next train`);
 }
 
 /**
@@ -173,19 +173,19 @@ function sayNextTrain(bot, message) {
  * @returns {void}
  */
 function saySchedule(bot, message) {
-  const dates = trainRecurrence.next(numTrainsSchedule);
-  let text = "The release trains leaves on the following dates: \n";
+    const dates = trainRecurrence.next(numTrainsSchedule);
+    let text = "The release trains leaves on the following dates: \n";
 
-  for (let i = 0; i < dates.length; i++) {
-    text += `${dates[i].format(dateFormat)} at ${scheduleTime.format("HH:mm")} \n`;
-  }
+    for (let i = 0; i < dates.length; i++) {
+        text += `${dates[i].format(dateFormat)} at ${scheduleTime.format("HH:mm")} \n`;
+    }
 
-  bot.reply(
+    bot.reply(
     message,
     text
   );
 
-  winston.log("info", `${message.user} asks for schedule`);
+    winston.log("info", `${message.user} asks for schedule`);
 }
 
 /**
@@ -193,12 +193,12 @@ function saySchedule(bot, message) {
  * @returns {void}
  */
 function sayOneDayBefore() {
-  announcer.sendWebhook({
-    text: `The release train leaves tomorrow at ${scheduleTime.format("HH:mm")}!`,
-    channel: slackChannel,
-  });
+    announcer.sendWebhook({
+        text: `The release train leaves tomorrow at ${scheduleTime.format("HH:mm")}!`,
+        channel: slackChannel,
+    });
 
-  winston.log("info", "Announced: Train leaving in one day");
+    winston.log("info", "Announced: Train leaving in one day");
 }
 
 /**
@@ -206,12 +206,12 @@ function sayOneDayBefore() {
  * @returns {void}
  */
 function sayLeaving() {
-  announcer.sendWebhook({
-    text: "Choo! Choo! The release train is leaving!",
-    channel: slackChannel,
-  });
+    announcer.sendWebhook({
+        text: "Choo! Choo! The release train is leaving!",
+        channel: slackChannel,
+    });
 
-  winston.log("info", "Announced: Train leaving now");
+    winston.log("info", "Announced: Train leaving now");
 }
 
 /**
@@ -221,7 +221,7 @@ function sayLeaving() {
  * @returns {void}
  */
 function sayDefault(bot, message) {
-  bot.reply(
+    bot.reply(
     message,
     "Does not compute... I only know about trains :blush:"
   );
