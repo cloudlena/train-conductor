@@ -1,8 +1,7 @@
 # Train Conductor
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/mastertinner/train-conductor.svg)](https://greenkeeper.io/)
-
 [![Build Status](https://travis-ci.org/mastertinner/train-conductor.svg?branch=master)](https://travis-ci.org/mastertinner/train-conductor)
+[![Greenkeeper badge](https://badges.greenkeeper.io/mastertinner/train-conductor.svg)](https://greenkeeper.io/)
 
 A Slack bot which announces the schedule of a [software release train](https://en.wikipedia.org/wiki/Software_release_train). Can be deployed to Cloud Foundry or any other server/platform.
 
