@@ -11,11 +11,7 @@ const defaultIntervalDays = 7;
 const defaultSlackChannel = "#release";
 const msInMinute = 60000;
 const dateFormat = "dddd, MMM Do";
-const messageToBot = [
-    "direct_message",
-    "direct_mention",
-    "mention",
-];
+const messageToBot = ["direct_message", "direct_mention", "mention"];
 
 const slackApiToken = process.env.SLACK_API_TOKEN;
 
@@ -66,9 +62,9 @@ if (isNaN(intervalDays)) {
 
 // Set up recurrence
 const trainRecurrence = startDate
-  .subtract(intervalDays, "days")
-  .recur()
-  .every(intervalDays, "days");
+    .subtract(intervalDays, "days")
+    .recur()
+    .every(intervalDays, "days");
 
 dropPastOccurrences(trainRecurrence);
 
@@ -144,9 +140,9 @@ function checkForEvents(recurrence) {
  */
 function sayHi(bot, message) {
     bot.reply(
-    message,
-    "Hi there. How can I help you?"
-  );
+        message,
+        "Hi there. How can I help you?"
+    );
 
     winston.info(`${message.user} says hi`);
 }
@@ -159,9 +155,9 @@ function sayHi(bot, message) {
  */
 function sayNextTrain(bot, message) {
     bot.reply(
-    message,
-    `The next release train leaves on ${trainRecurrence.next(1)[0].format(dateFormat)} at ${scheduleTime.format("HH:mm")}.`
-  );
+        message,
+        `The next release train leaves on ${trainRecurrence.next(1)[0].format(dateFormat)} at ${scheduleTime.format("HH:mm")}.`
+    );
 
     winston.info(`${message.user} asks for next train`);
 }
@@ -181,9 +177,9 @@ function saySchedule(bot, message) {
     }
 
     bot.reply(
-    message,
-    text
-  );
+        message,
+        text
+    );
 
     winston.log("info", `${message.user} asks for schedule`);
 }
@@ -222,7 +218,7 @@ function sayLeaving() {
  */
 function sayDefault(bot, message) {
     bot.reply(
-    message,
-    "Does not compute... I only know about trains :blush:"
-  );
+        message,
+        "Does not compute... I only know about trains :blush:"
+    );
 }
