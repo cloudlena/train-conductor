@@ -15,13 +15,13 @@
   "author": "Tobias Fuhrimann (https://berndsgn.ch)",
   "license": "ISC",
   "dependencies": {
-    "botkit": "^0.6.0",
+    "botkit": "^0.6.4",
     "moment-recur": "^1.0.7",
     "moment-timezone": "^0.5.11",
-    "winston": "^2.3.1"
+    "winston": "^2.4.0"
   },
   "devDependencies": {
-    "eslint": "^4.6.1",
+    "eslint": "^4.9.0",
     "eslint-config-mastertinner-nodejs": "^12.7.1",
     "eslint-plugin-mocha": "^4.11.0"
   },
