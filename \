@@ -1,0 +1,10 @@
+import { expect } from "chai";
+import * as moment from "moment";
+import { dropPastOccurrences } from "./recurrence";
+
+describe("dropPastOccurrences", () => {
+  it("drops past occurrences", () => {
+    const scheduleTime = moment();
+    expect(dropPastOccurrences(recurrence, scheduleTime)).to.equal(-1);
+  });
+});
