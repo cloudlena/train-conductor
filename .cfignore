@@ -1,4 +1,5 @@
-node_modules
-npm-debug.log
-.eslintrc.json
-README.md
+/*
+
+!/dist/
+!/package.json
+!/package-lock.json
