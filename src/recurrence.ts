@@ -8,12 +8,13 @@ export const dropPastOccurrences = (
   recurrence: Recur,
   scheduleTime: moment.Moment,
   now: moment.Moment,
-) => {
+): Recur => {
   const newRecurrence = recurrence;
   let found = false;
 
   while (!found) {
     const nextDate = newRecurrence.next(1)[0];
+    console.log(nextDate);
 
     nextDate.hours(scheduleTime.hours());
     nextDate.minutes(scheduleTime.minutes());
@@ -34,7 +35,7 @@ export const checkForEvents = (
   scheduleTime: moment.Moment,
   bot: SlackBot,
   slackChannel: string,
-) => {
+): void => {
   const now = moment.tz("Europe/Zurich");
 
   console.log(`Checking for events at ${now.format("HH:mm:ss")}`);

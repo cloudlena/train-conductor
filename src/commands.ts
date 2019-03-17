@@ -17,16 +17,16 @@ const numTrainsSchedule = 5;
 const dateFormat = "dddd, MMM Do";
 
 // Says hello
-export const sayHi: SlackHearsCallback = (bot, message) => {
+export const sayHi: SlackHearsCallback = (bot, message): void => {
   bot.reply(message, "Hi there. How can I help you?");
   console.log(`${message.user} says hi`);
 };
 
 // Replies saying when the train is leaving
-export const sayNextTrain = (recurrence: Recur, scheduleTime: Moment) => (
-  bot: SlackBot,
-  message: SlackMessage,
-) => {
+export const sayNextTrain = (
+  recurrence: Recur,
+  scheduleTime: Moment,
+): ((bot: SlackBot, message: SlackMessage) => void) => (bot, message) => {
   bot.reply(
     message,
     `The next release train leaves on ${recurrence
@@ -37,10 +37,10 @@ export const sayNextTrain = (recurrence: Recur, scheduleTime: Moment) => (
 };
 
 // Replies with the train schedule
-export const saySchedule = (recurrence: Recur, scheduleTime: Moment) => (
-  bot: SlackBot,
-  message: SlackMessage,
-) => {
+export const saySchedule = (
+  recurrence: Recur,
+  scheduleTime: Moment,
+): ((bot: SlackBot, message: SlackMessage) => void) => (bot, message) => {
   const dates = recurrence.next(numTrainsSchedule);
   let text = "The release trains leaves on the following dates: \n";
 
@@ -54,7 +54,7 @@ export const saySchedule = (recurrence: Recur, scheduleTime: Moment) => (
 };
 
 // Default message if conductor doesn't understand the question
-export const sayDefault: SlackHearsCallback = (bot, message) => {
+export const sayDefault: SlackHearsCallback = (bot, message): void => {
   bot.reply(message, "Does not compute... I only know about trains :blush:");
 };
 
@@ -63,7 +63,7 @@ export const sayOneDayBefore = (
   bot: SlackBot,
   scheduleTime: Moment,
   slackChannel: string,
-) => {
+): void => {
   bot.sendWebhook(
     {
       channel: slackChannel,
@@ -76,7 +76,7 @@ export const sayOneDayBefore = (
 };
 
 // Says that the train is leaving;
-export const sayLeaving = (bot: SlackBot, slackChannel: string) => {
+export const sayLeaving = (bot: SlackBot, slackChannel: string): void => {
   bot.sendWebhook(
     {
       channel: slackChannel,
