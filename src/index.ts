@@ -13,9 +13,9 @@ const slackWebhookURL = process.env.SLACK_WEBHOOK_URL;
 if (!slackWebhookURL) {
   throw Error("Please provide SLACK_WEBHOOK_URL");
 }
-const startDate = moment(process.env.START_DATE, "DD/MM/YYYY");
+const startDate = moment(process.env.START_DATE);
 if (!startDate.isValid()) {
-  throw Error("Invalid start date. Please provide START_DATE as DD/MM/YYYY");
+  throw Error("Invalid start date. Please provide START_DATE as YYYY-MM-DD");
 }
 const scheduleTime = moment(process.env.SCHEDULE_TIME, "HH:mm");
 if (!scheduleTime.isValid()) {
@@ -39,12 +39,12 @@ recurrence = dropPastOccurrences(recurrence, scheduleTime, moment());
 console.log(
   `Recurrence set. Next train scheduled for ${recurrence
     .next(1)[0]
-    .format("DD/MM/YYYY")} at ${scheduleTime.format("HH:mm")}`,
+    .format("YYYY-MM-DD")} at ${scheduleTime.format("HH:mm")}`,
 );
 
 // Set up Slack bot
 const controller = slackbot({
-  incoming_webhook: { url: slackWebhookURL },
+  incoming_webhook: { url: slackWebhookURL }, // eslint-disable-line @typescript-eslint/camelcase
 });
 const bot = controller.spawn({ token: slackApiToken }).startRTM();
 
