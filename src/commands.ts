@@ -26,7 +26,7 @@ export const sayHi: SlackHearsCallback = (bot, message): void => {
 export const sayNextTrain = (
   recurrence: Recur,
   scheduleTime: Moment,
-): ((bot: SlackBot, message: SlackMessage) => void) => (bot, message) => {
+): ((bot: SlackBot, message: SlackMessage) => void) => (bot, message): void => {
   bot.reply(
     message,
     `The next release train leaves on ${recurrence
@@ -40,7 +40,7 @@ export const sayNextTrain = (
 export const saySchedule = (
   recurrence: Recur,
   scheduleTime: Moment,
-): ((bot: SlackBot, message: SlackMessage) => void) => (bot, message) => {
+): ((bot: SlackBot, message: SlackMessage) => void) => (bot, message): void => {
   const dates = recurrence.next(numTrainsSchedule);
   let text = "The release trains leaves on the following dates: \n";
 
@@ -71,7 +71,9 @@ export const sayOneDayBefore = (
         "HH:mm",
       )}!`,
     },
-    () => console.log("Announced: Train leaving in one day"),
+    (): void => {
+      console.log("Announced: Train leaving in one day");
+    },
   );
 };
 
@@ -82,6 +84,8 @@ export const sayLeaving = (bot: SlackBot, slackChannel: string): void => {
       channel: slackChannel,
       text: "Choo! Choo! The release train is leaving!",
     },
-    () => console.log("Announced: Train leaving now"),
+    (): void => {
+      console.log("Announced: Train leaving now");
+    },
   );
 };

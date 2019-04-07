@@ -2,8 +2,8 @@ import * as moment from "moment";
 import "moment-recur-ts";
 import { dropPastOccurrences } from "./recurrence";
 
-describe("dropPastOccurrences", () => {
-  it("drops past occurrences", () => {
+describe("dropPastOccurrences", (): void => {
+  it("drops past occurrences", (): void => {
     const startDate = moment("2015-04-26");
     const recurrence = startDate.recur().every(10, "days");
     const scheduleTime = moment("14:15", "HH:mm");

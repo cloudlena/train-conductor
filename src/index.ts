@@ -63,6 +63,6 @@ controller.hears(
 controller.hears([".*"], messageToBot, sayDefault);
 
 setInterval(
-  () => checkForEvents(recurrence, scheduleTime, bot, slackChannel),
+  (): void => checkForEvents(recurrence, scheduleTime, bot, slackChannel),
   60 * 1000,
 );
