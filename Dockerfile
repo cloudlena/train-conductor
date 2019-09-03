@@ -12,4 +12,4 @@ COPY --from=builder /usr/src/train-conductor/dist dist/
 COPY --from=builder /etc/passwd /etc/passwd
 RUN npm ci --production
 USER train-conductor
-ENTRYPOINT ["npm", "start"]
+CMD ["npm", "start"]
