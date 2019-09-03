@@ -25,13 +25,13 @@ export const sayHi: SlackHearsCallback = (bot, message): void => {
 // Replies saying when the train is leaving
 export const sayNextTrain = (
   recurrence: Recur,
-  scheduleTime: Moment,
+  scheduleTime: Moment
 ): ((bot: SlackBot, message: SlackMessage) => void) => (bot, message): void => {
   bot.reply(
     message,
     `The next release train leaves on ${recurrence
       .next(1)[0]
-      .format(dateFormat)} at ${scheduleTime.format("HH:mm")}.`,
+      .format(dateFormat)} at ${scheduleTime.format("HH:mm")}.`
   );
   console.log(`${message.user} asks for next train`);
 };
@@ -39,7 +39,7 @@ export const sayNextTrain = (
 // Replies with the train schedule
 export const saySchedule = (
   recurrence: Recur,
-  scheduleTime: Moment,
+  scheduleTime: Moment
 ): ((bot: SlackBot, message: SlackMessage) => void) => (bot, message): void => {
   const dates = recurrence.next(numTrainsSchedule);
   let text = "The release trains leaves on the following dates: \n";
@@ -62,18 +62,18 @@ export const sayDefault: SlackHearsCallback = (bot, message): void => {
 export const sayOneDayBefore = (
   bot: SlackBot,
   scheduleTime: Moment,
-  slackChannel: string,
+  slackChannel: string
 ): void => {
   bot.sendWebhook(
     {
       channel: slackChannel,
       text: `The release train leaves tomorrow at ${scheduleTime.format(
-        "HH:mm",
+        "HH:mm"
       )}!`,
     },
     (): void => {
       console.log("Announced: Train leaving in one day");
-    },
+    }
   );
 };
 
@@ -86,6 +86,6 @@ export const sayLeaving = (bot: SlackBot, slackChannel: string): void => {
     },
     (): void => {
       console.log("Announced: Train leaving now");
-    },
+    }
   );
 };

@@ -1,6 +1,7 @@
 # Train Conductor
 
 [![Build Status](https://travis-ci.org/mastertinner/train-conductor.svg?branch=master)](https://travis-ci.org/mastertinner/train-conductor)
+[![Docker Build](https://img.shields.io/docker/cloud/build/mastertinner/train-conductor.svg?style=flat-square)](https://hub.docker.com/r/mastertinner/train-conductor)
 
 A Slack bot which announces the schedule of a [software release train](https://en.wikipedia.org/wiki/Software_release_train). Can be deployed to Cloud Foundry or any other server/platform.
 

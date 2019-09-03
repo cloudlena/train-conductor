@@ -39,7 +39,7 @@ recurrence = dropPastOccurrences(recurrence, scheduleTime, moment());
 console.log(
   `Recurrence set. Next train scheduled for ${recurrence
     .next(1)[0]
-    .format("YYYY-MM-DD")} at ${scheduleTime.format("HH:mm")}`,
+    .format("YYYY-MM-DD")} at ${scheduleTime.format("HH:mm")}`
 );
 
 // Set up Slack bot
@@ -53,16 +53,16 @@ controller.hears(["hi", "hello", "howdy"], messageToBot, sayHi);
 controller.hears(
   ["when", "next", "train"],
   messageToBot,
-  sayNextTrain(recurrence, scheduleTime),
+  sayNextTrain(recurrence, scheduleTime)
 );
 controller.hears(
   ["schedule"],
   messageToBot,
-  saySchedule(recurrence, scheduleTime),
+  saySchedule(recurrence, scheduleTime)
 );
 controller.hears([".*"], messageToBot, sayDefault);
 
 setInterval(
   (): void => checkForEvents(recurrence, scheduleTime, bot, slackChannel),
-  60 * 1000,
+  60 * 1000
 );
