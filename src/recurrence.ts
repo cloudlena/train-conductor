@@ -7,7 +7,7 @@ import { sayLeaving, sayOneDayBefore } from "./commands";
 export const dropPastOccurrences = (
   recurrence: Recur,
   scheduleTime: moment.Moment,
-  now: moment.Moment,
+  now: moment.Moment
 ): Recur => {
   const newRecurrence = recurrence;
   let found = false;
@@ -34,7 +34,7 @@ export const checkForEvents = (
   recurrence: Recur,
   scheduleTime: moment.Moment,
   bot: SlackBot,
-  slackChannel: string,
+  slackChannel: string
 ): void => {
   const now = moment.tz("Europe/Zurich");
 
